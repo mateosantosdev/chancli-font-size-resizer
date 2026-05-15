@@ -1,0 +1,41 @@
+/* Font Size Plugin — static styles (runtime styles are injected via JS) */
+
+.font-size-plugin-bar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.font-size-plugin-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    border-radius: 4px;
+    color: var(--status-bar-text-color);
+    opacity: 0.7;
+    transition:
+        opacity 0.15s ease,
+        background-color 0.15s ease;
+    flex-shrink: 0;
+}
+
+.font-size-plugin-btn:hover {
+    opacity: 1;
+    background-color: var(--interactive-hover);
+}
+
+.font-size-plugin-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.font-size-plugin-label {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    min-width: 52px;
+    text-align: center;
+    font-size: var(--status-bar-font-size);
+}
