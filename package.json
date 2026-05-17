@@ -1,6 +1,6 @@
 {
-  "name": "obsidian-font-size-plugin",
-  "version": "1.0.2",
+  "name": "obsidian-font-resizer",
+  "version": "1.0.3",
   "description": "Increase or decrease the note font size.",
   "main": "dist/main.js",
   "scripts": {
