@@ -1,6 +1,6 @@
 {
   "name": "chancli-font-size-resizer",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Increase or decrease the note font size.",
   "main": "dist/main.js",
   "scripts": {
