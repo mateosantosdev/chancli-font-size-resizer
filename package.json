@@ -1,5 +1,5 @@
 {
-  "name": "obsidian-font-resizer",
+  "name": "chancli-font-size-resizer",
   "version": "1.0.4",
   "description": "Increase or decrease the note font size.",
   "main": "dist/main.js",

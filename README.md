@@ -22,7 +22,7 @@ Works in Live Preview, Reading View, and Source Mode. Size persists across resta
 ## Installation
 
 1. Run `npm install && npm run build`
-2. Copy `dist/main.js`, `manifest.json`, and `styles.css` into `<vault>/.obsidian/plugins/font-size-plugin/`
+2. Copy `dist/main.js`, `manifest.json`, and `styles.css` into `<vault>/.obsidian/plugins/chancli-font-size-resizer/`
 3. Enable the plugin in Settings → Community Plugins
 
 ## License
