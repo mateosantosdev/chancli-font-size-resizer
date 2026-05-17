@@ -22,8 +22,10 @@ const DEFAULT_SETTINGS: FontSizeSettings = {
   maxSize: 32,
 };
 
+const HEADING_RATIOS = [2.0, 1.5, 1.25, 1.125, 1.0, 0.875] as const;
+
 export default class FontSizePlugin extends Plugin {
-  settings: FontSizeSettings = DEFAULT_SETTINGS;
+  settings: FontSizeSettings = { ...DEFAULT_SETTINGS };
 
   private styleEl: HTMLStyleElement | null = null;
 
@@ -62,7 +64,7 @@ export default class FontSizePlugin extends Plugin {
     this.styleEl = null;
   }
 
-  changeFontSize(delta: number): void {
+  private async changeFontSize(delta: number): Promise<void> {
     const next = this.settings.fontSize + delta;
 
     if (next < this.settings.minSize) {
@@ -77,16 +79,16 @@ export default class FontSizePlugin extends Plugin {
     this.settings.fontSize = next;
     this.applyFontSize();
     this.updateStatusBar();
-    this.saveSettings();
+    await this.saveSettings();
 
     new Notice(`Font size: ${next}px`);
   }
 
-  resetFontSize(): void {
+  private async resetFontSize(): Promise<void> {
     this.settings.fontSize = DEFAULT_SETTINGS.fontSize;
     this.applyFontSize();
     this.updateStatusBar();
-    this.saveSettings();
+    await this.saveSettings();
     new Notice(`Font size reset to ${DEFAULT_SETTINGS.fontSize}px`);
   }
 
@@ -94,17 +96,14 @@ export default class FontSizePlugin extends Plugin {
     if (!this.styleEl) return;
 
     const px = this.settings.fontSize;
-    const headingLineHeight = (ratio: number) => Math.round(px * ratio * 1.3);
-
-    const HEADING_RATIOS = [2.0, 1.5, 1.25, 1.125, 1.0, 0.875];
 
     const headingCss = HEADING_RATIOS.map((ratio, i) => {
       const level = i + 1;
       const headingFontSize = Math.round(px * ratio);
-      const calcLineHeight = headingLineHeight(ratio);
+      const headingLineHeight = Math.round(headingFontSize * 1.3);
       return `
-      .cm-editor .cm-line.HyperMD-header-${level} { font-size: ${headingFontSize}px !important; line-height: ${calcLineHeight}px !important; }
-      .markdown-reading-view .markdown-preview-section h${level} { font-size: ${headingFontSize}px !important; line-height: ${calcLineHeight}px !important; }`;
+      .cm-editor .cm-line.HyperMD-header-${level} { font-size: ${headingFontSize}px !important; line-height: ${headingLineHeight}px !important; }
+      .markdown-reading-view .markdown-preview-section h${level} { font-size: ${headingFontSize}px !important; line-height: ${headingLineHeight}px !important; }`;
     }).join("");
 
     this.styleEl.textContent = `
@@ -156,7 +155,20 @@ export default class FontSizePlugin extends Plugin {
   }
 
   async loadSettings(): Promise<void> {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    const data = await this.loadData();
+    const settings: FontSizeSettings = Object.assign(
+      {},
+      DEFAULT_SETTINGS,
+      data,
+    );
+    settings.step = Math.max(1, settings.step);
+    settings.minSize = Math.max(1, settings.minSize);
+    settings.maxSize = Math.max(settings.minSize + 1, settings.maxSize);
+    settings.fontSize = Math.max(
+      settings.minSize,
+      Math.min(settings.maxSize, settings.fontSize),
+    );
+    this.settings = settings;
   }
 
   async saveSettings(): Promise<void> {
