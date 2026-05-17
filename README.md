@@ -1,8 +1,12 @@
-# Obsidian Font Size Plugin
+# Chancli Font Size Resizer for Obsidian
 
 Increase or decrease the note editor font size from the status bar. Headers scale proportionally; body text scales independently.
 
 Works in Live Preview, Reading View, and Source Mode. Size persists across restarts.
+
+## Demo
+
+![Demo](./assets/demo.gif)
 
 ## Usage
 
