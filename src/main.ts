@@ -5,9 +5,8 @@ import {
   Setting,
   Notice,
   setIcon,
+  SliderComponent,
 } from "obsidian";
-
-// ─── Settings ────────────────────────────────────────────────────────────────
 
 interface FontSizeSettings {
   fontSize: number;
@@ -23,8 +22,6 @@ const DEFAULT_SETTINGS: FontSizeSettings = {
   maxSize: 32,
 };
 
-// ─── Plugin ──────────────────────────────────────────────────────────────────
-
 export default class FontSizePlugin extends Plugin {
   settings: FontSizeSettings = DEFAULT_SETTINGS;
 
@@ -33,13 +30,10 @@ export default class FontSizePlugin extends Plugin {
   async onload(): Promise<void> {
     await this.loadSettings();
 
-    // Inject a <style> tag we can update at runtime
     this.styleEl = document.createElement("style");
     this.styleEl.id = "font-size-plugin-style";
     document.head.appendChild(this.styleEl);
     this.applyFontSize();
-
-    // ── Commands (palette + hotkeys) ────────────────────────────────────────
 
     this.addCommand({
       id: "increase-font-size",
@@ -59,12 +53,7 @@ export default class FontSizePlugin extends Plugin {
       callback: () => this.resetFontSize(),
     });
 
-    // ── Settings tab ────────────────────────────────────────────────────────
-
     this.addSettingTab(new FontSizeSettingTab(this.app, this));
-
-    // ── Status bar ──────────────────────────────────────────────────────────
-
     this.updateStatusBar();
   }
 
@@ -72,8 +61,6 @@ export default class FontSizePlugin extends Plugin {
     this.styleEl?.remove();
     this.styleEl = null;
   }
-
-  // ── Core helpers ───────────────────────────────────────────────────────────
 
   changeFontSize(delta: number): void {
     const next = this.settings.fontSize + delta;
@@ -103,13 +90,23 @@ export default class FontSizePlugin extends Plugin {
     new Notice(`Font size reset to ${DEFAULT_SETTINGS.fontSize}px`);
   }
 
-  /** Writes CSS that targets the editor and reading view text. */
   applyFontSize(): void {
     if (!this.styleEl) return;
 
     const px = this.settings.fontSize;
+    const headingLineHeight = (ratio: number) => Math.round(px * ratio * 1.3);
 
-    // Covers Live Preview (CM6) + Reading View + Source Mode
+    const HEADING_RATIOS = [2.0, 1.5, 1.25, 1.125, 1.0, 0.875];
+
+    const headingCss = HEADING_RATIOS.map((ratio, i) => {
+      const level = i + 1;
+      const headingFontSize = Math.round(px * ratio);
+      const calcLineHeight = headingLineHeight(ratio);
+      return `
+      .cm-editor .cm-line.HyperMD-header-${level} { font-size: ${headingFontSize}px !important; line-height: ${calcLineHeight}px !important; }
+      .markdown-reading-view .markdown-preview-section h${level} { font-size: ${headingFontSize}px !important; line-height: ${calcLineHeight}px !important; }`;
+    }).join("");
+
     this.styleEl.textContent = `
       .cm-editor .cm-content,
       .cm-editor .cm-line,
@@ -118,10 +115,9 @@ export default class FontSizePlugin extends Plugin {
         font-size: ${px}px !important;
         line-height: ${Math.round(px * 1.6)}px !important;
       }
+      ${headingCss}
     `;
   }
-
-  // ── Status bar ─────────────────────────────────────────────────────────────
 
   private statusBarEl: HTMLElement | null = null;
   private statusLabelEl: HTMLElement | null = null;
@@ -131,7 +127,6 @@ export default class FontSizePlugin extends Plugin {
       this.statusBarEl = this.addStatusBarItem();
       this.statusBarEl.addClass("font-size-plugin-bar");
 
-      // − button
       const btnDecrease = this.statusBarEl.createEl("div", {
         cls: "font-size-plugin-btn",
         title: "Decrease font size",
@@ -141,12 +136,10 @@ export default class FontSizePlugin extends Plugin {
         this.changeFontSize(-this.settings.step),
       );
 
-      // label
       this.statusLabelEl = this.statusBarEl.createEl("span", {
         cls: "font-size-plugin-label",
       });
 
-      // + button
       const btnIncrease = this.statusBarEl.createEl("div", {
         cls: "font-size-plugin-btn",
         title: "Increase font size",
@@ -162,8 +155,6 @@ export default class FontSizePlugin extends Plugin {
     }
   }
 
-  // ── Persistence ────────────────────────────────────────────────────────────
-
   async loadSettings(): Promise<void> {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
   }
@@ -172,8 +163,6 @@ export default class FontSizePlugin extends Plugin {
     await this.saveData(this.settings);
   }
 }
-
-// ─── Settings Tab ────────────────────────────────────────────────────────────
 
 class FontSizeSettingTab extends PluginSettingTab {
   plugin: FontSizePlugin;
@@ -187,8 +176,6 @@ class FontSizeSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
     containerEl.createEl("h2", { text: "Font Size Plugin" });
-
-    // ── Current size ──────────────────────────────────────────────────────
 
     new Setting(containerEl)
       .setName("Current font size (px)")
@@ -210,8 +197,6 @@ class FontSizeSettingTab extends PluginSettingTab {
           }),
       );
 
-    // ── Step size ─────────────────────────────────────────────────────────
-
     new Setting(containerEl)
       .setName("Step size (px)")
       .setDesc("How many pixels each button press changes the font size.")
@@ -226,35 +211,44 @@ class FontSizeSettingTab extends PluginSettingTab {
           }),
       );
 
-    // ── Min / Max ─────────────────────────────────────────────────────────
+    let minSlider!: SliderComponent;
+    let maxSlider!: SliderComponent;
 
     new Setting(containerEl)
       .setName("Minimum font size (px)")
-      .addSlider((slider) =>
+      .addSlider((slider) => {
+        minSlider = slider;
         slider
           .setLimits(8, 20, 1)
           .setValue(this.plugin.settings.minSize)
           .setDynamicTooltip()
           .onChange(async (value) => {
             this.plugin.settings.minSize = value;
+            if (value >= this.plugin.settings.maxSize) {
+              this.plugin.settings.maxSize = value + 1;
+              maxSlider.setValue(value + 1);
+            }
             await this.plugin.saveSettings();
-          }),
-      );
+          });
+      });
 
     new Setting(containerEl)
       .setName("Maximum font size (px)")
-      .addSlider((slider) =>
+      .addSlider((slider) => {
+        maxSlider = slider;
         slider
           .setLimits(18, 64, 1)
           .setValue(this.plugin.settings.maxSize)
           .setDynamicTooltip()
           .onChange(async (value) => {
             this.plugin.settings.maxSize = value;
+            if (value <= this.plugin.settings.minSize) {
+              this.plugin.settings.minSize = value - 1;
+              minSlider.setValue(value - 1);
+            }
             await this.plugin.saveSettings();
-          }),
-      );
-
-    // ── Reset button ──────────────────────────────────────────────────────
+          });
+      });
 
     new Setting(containerEl).setName("Reset to defaults").addButton((btn) =>
       btn
@@ -265,7 +259,7 @@ class FontSizeSettingTab extends PluginSettingTab {
           this.plugin.applyFontSize();
           this.plugin.updateStatusBar();
           await this.plugin.saveSettings();
-          this.display(); // re-render the tab
+          this.display();
         }),
     );
   }

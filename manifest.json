@@ -3,9 +3,9 @@
   "name": "Font Size",
   "version": "1.0.0",
   "minAppVersion": "1.4.0",
-  "description": "Quickly increase or decrease the editor font size using two ribbon buttons.",
+  "description": "Quickly increase or decrease the editor font size.",
   "author": "Mateo Santos",
-  "authorUrl": "https://github.com/yourname/obsidian-font-size-plugin",
+  "authorUrl": "https://github.com/mateosantosdev/obsidian-font-size-plugin",
   "fundingUrl": "",
   "isDesktopOnly": false
 }

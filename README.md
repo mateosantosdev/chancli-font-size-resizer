@@ -1,68 +1,29 @@
 # Obsidian Font Size Plugin
 
-Adds two ribbon buttons to instantly increase or decrease the note editor font size — no settings menu required.
+Increase or decrease the note editor font size from the status bar. Headers scale proportionally; body text scales independently.
 
-## Features
-
-- **➕ Increase** and **➖ Decrease** ribbon buttons
-- Works in Live Preview, Reading View, and Source Mode
-- Persists your chosen size across Obsidian restarts
-- Status bar shows the current size at a glance (`𝐀 18px`)
-- Command palette commands + hotkey support
-- Settings tab to fine-tune step size, min/max bounds, and reset
-
-## Installation
-
-### Manual (recommended for development)
-
-1. Build the plugin (see below).
-2. Copy `main.js`, `manifest.json`, and `styles.css` into:
-   ```
-   <your-vault>/.obsidian/plugins/font-size-plugin/
-   ```
-3. In Obsidian → Settings → Community Plugins, enable **Font Size**.
-
-### Development build
-
-```bash
-npm install
-npm run build      # production build → dist/main.js
-npm run dev        # watch mode
-```
+Works in Live Preview, Reading View, and Source Mode. Size persists across restarts.
 
 ## Usage
 
-| Action | How |
-|--------|-----|
-| Increase font | Click **＋** ribbon button |
-| Decrease font | Click **－** ribbon button |
-| Increase font | Command palette → *Increase note font size* |
-| Decrease font | Command palette → *Decrease note font size* |
-| Reset to 16px | Command palette → *Reset note font size to default* |
-| Fine-tune | Settings → Font Size |
+- **Status bar** — click `−` / `+` buttons next to the `𝐀 16px` indicator
+- **Command palette** — *Increase / Decrease / Reset note font size*
+- **Settings tab** — adjust step size, min/max bounds, or drag the live slider
 
 ## Settings
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| Current font size | 16 px | Live slider — synced with buttons |
-| Step size | 1 px | Pixels changed per button press |
-| Minimum size | 10 px | Lower bound (prevents invisible text) |
-| Maximum size | 32 px | Upper bound |
+| Setting | Default |
+|---------|---------|
+| Font size | 16 px |
+| Step size | 1 px |
+| Minimum | 10 px |
+| Maximum | 32 px |
 
-## Project Structure
+## Installation
 
-```
-obsidian-font-size-plugin/
-├── src/
-│   └── main.ts          # Plugin source (TypeScript)
-├── esbuild.config.mjs   # Bundler config
-├── manifest.json        # Obsidian plugin manifest
-├── package.json
-├── styles.css
-├── tsconfig.json
-└── versions.json
-```
+1. Run `npm install && npm run build`
+2. Copy `dist/main.js`, `manifest.json`, and `styles.css` into `<vault>/.obsidian/plugins/font-size-plugin/`
+3. Enable the plugin in Settings → Community Plugins
 
 ## License
 
