@@ -1,10 +1,10 @@
 {
-  "id": "font-size-plugin",
+  "id": "font-size-resizer",
   "name": "Font Size",
   "version": "1.0.2",
   "minAppVersion": "1.4.0",
   "description": "Quickly increase or decrease the editor font size.",
   "author": "Mateo Santos",
-  "authorUrl": "https://github.com/mateosantosdev/obsidian-font-size-plugin",
+  "authorUrl": "https://github.com/mateosantosdev",
   "isDesktopOnly": false
 }
