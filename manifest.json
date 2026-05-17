@@ -1,7 +1,7 @@
 {
   "id": "chancli-font-size-resizer",
   "name": "Chancli Font Size Resizer",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "minAppVersion": "1.4.0",
   "description": "Quickly increase or decrease the editor font size.",
   "author": "Mateo Santos",
